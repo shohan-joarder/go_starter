@@ -1,13 +1,17 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/shohan-joarder/go_pos/internal/models"
 	"github.com/shohan-joarder/go_pos/internal/services"
 	"github.com/shohan-joarder/go_pos/internal/utils"
+	"github.com/spf13/viper"
 )
 
 type RoleController struct {
@@ -100,4 +104,58 @@ func (c *RoleController) DeleteRole(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "Role deleted successfully"})
+}
+
+func getPermissionsFilePath() (string, error) {
+	exePath, err := os.Executable() // Get the path to the executable
+	if err != nil {
+		return "", err
+	}
+	exeDir := filepath.Dir(exePath) // Get the directory containing the executable
+	return filepath.Join(exeDir, "data", "permissions.json"), nil
+}
+
+func (c *RoleController) PermissionsKeys(ctx *gin.Context) {
+
+	viper.SetConfigName("permissions") // File name without extension
+	viper.SetConfigType("json")        // File type
+	viper.AddConfigPath("./data")      // Path to look for the configuration file
+	viper.AddConfigPath(".")           // Also check the current directory
+
+	// Read the configuration file
+	err := viper.ReadInConfig()
+	if err != nil {
+		fmt.Printf("Error reading config file, %s\n", err)
+		return
+	}
+
+	fmt.Println("permissions", viper.Get("permissions"))
+
+	permissions := viper.Get("permissions").(map[string]interface{})
+
+	ctx.JSON(http.StatusOK, gin.H{"data": permissions})
+
+	// filePath, err := getPermissionsFilePath()
+	// if err != nil {
+	// 	fmt.Println("Error determining file path:", err)
+	// 	ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to determine file path"})
+	// 	return
+	// }
+
+	// fileContent, err := os.ReadFile(filePath)
+	// if err != nil {
+	// 	fmt.Println("Error reading file:", err)
+	// 	ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to read permissions file"})
+	// 	return
+	// }
+
+	// var permissions models.Permissions
+	// err = json.Unmarshal(fileContent, &permissions)
+	// if err != nil {
+	// 	fmt.Println("Error parsing JSON:", err)
+	// 	ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid permissions JSON"})
+	// 	return
+	// }
+
+	// ctx.JSON(http.StatusOK, gin.H{"data": permissions})
 }

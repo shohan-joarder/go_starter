@@ -22,14 +22,24 @@ func Start() {
 	config := LoadConfig()
 	db := database.ConnectPostgres(config.DatabaseURL)
 
-	// Initialize repositories and services for roles and users
+	// Initialize repositories and services for role permissions
+	rolePermissionRepo := repositories.NewRolePermissionRepository(db)
+	rolePermissionService := services.NewRolePermissionService(rolePermissionRepo)
+
+	// Initialize repositories and services for roles
 	roleRepo := repositories.NewRoleRepository(db)
 	roleService := services.NewRoleService(roleRepo)
 	roleController := controllers.NewRoleController(roleService)
 
+	// Initialize repositories and services for users
 	userRepo := repositories.NewUserRepository(db)
 	userService := services.NewUserService(userRepo)
 	userController := controllers.NewUserController(userService)
+
+	// Initialize repositories and services for auth
+	authRepo := repositories.NewAuthRepository(db)
+	authService := services.NewAuthService(authRepo)
+	authController := controllers.NewAuthController(authService)
 
 	// Setup router
 	router := gin.Default()
@@ -37,9 +47,10 @@ func Start() {
 	// Create the /api group
 	apiGroup := router.Group("/api", middlewares.JSONValidationMiddleware())
 
-	// Register routes for both roles and users
-	routes.RegisterRoleRoutes(apiGroup, roleController)
-	routes.RegisterUserRoutes(apiGroup, userController)
+	// Register routes for roles, users, and auth
+	routes.RegisterRoleRoutes(apiGroup, roleController, rolePermissionService) // Role routes
+	routes.RegisterUserRoutes(apiGroup, userController, rolePermissionService) // User routes
+	routes.RegisterAuthRoutes(apiGroup, authController)                        // Auth routes
 
 	// Run the server
 	log.Fatal(router.Run(":8080"))

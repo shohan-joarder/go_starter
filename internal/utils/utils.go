@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -50,4 +51,31 @@ func GetEnv(key, fallback string) string {
 		return fallback
 	}
 	return value
+}
+
+// Match URL with dynamic parts (e.g., :id)
+func MatchURL(pattern, url string) bool {
+	// Split the pattern and the actual URL into segments
+	patternParts := strings.Split(strings.TrimSuffix(pattern, "/"), "/")
+	urlParts := strings.Split(strings.TrimSuffix(url, "/"), "/")
+
+	// Check if the number of segments matches
+	if len(patternParts) != len(urlParts) {
+		return false
+	}
+
+	// Compare each segment
+	for i := 0; i < len(patternParts); i++ {
+		if strings.HasPrefix(patternParts[i], ":") {
+			// Dynamic segment matches any value
+			continue
+		}
+		if patternParts[i] != urlParts[i] {
+			// Segment mismatch
+			return false
+		}
+	}
+
+	// All segments matched
+	return true
 }

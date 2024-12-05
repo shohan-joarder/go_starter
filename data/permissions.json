@@ -1,0 +1,12 @@
+[
+    {"url": "/api/roles/", "methods": "GET", "status": true},
+    {"url": "/api/roles/", "methods": "POST", "status": true},
+    {"url": "/api/roles/:id", "methods": "GET", "status": true},
+    {"url": "/api/roles/:id", "methods": "PUT", "status": true},
+    {"url": "/api/roles/:id", "methods": "DELETE", "status": true},
+    {"url": "/api/users/", "methods": "GET", "status": true},
+    {"url": "/api/users/", "methods": "POST", "status": true},
+    {"url": "/api/users/:id", "methods": "GET", "status": true},
+    {"url": "/api/users/:id", "methods": "PUT", "status": true},
+    {"url": "/api/users/:id", "methods": "DELETE", "status": true}
+]
