@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/shohan-joarder/go_pos/internal/models"
 	"github.com/shohan-joarder/go_pos/internal/services"
 	"github.com/shohan-joarder/go_pos/internal/utils"
@@ -42,13 +43,18 @@ func (c *RoleController) CreateRole(ctx *gin.Context) {
 		return
 	}
 
-	if err := validate.Struct(role); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": utils.FormatValidationErrors(err)})
-		return
-	}
-
 	if err := c.service.CreateRole(&role); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "message": "Failed to create role"})
+		// Check if it's a validation error
+		if validationErrors, ok := err.(validator.ValidationErrors); ok {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error":  "Validation failed",
+				"errors": utils.FormatValidationErrors(validationErrors),
+			})
+			return
+		}
+
+		// Handle database or other errors
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create role", "details": err.Error()})
 		return
 	}
 
@@ -75,19 +81,25 @@ func (c *RoleController) UpdateRole(ctx *gin.Context) {
 		return
 	}
 
-	if err := validate.Struct(role); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": utils.FormatValidationErrors(err)})
-		return
-	}
-
 	role.ID = uint(id)
 
 	if err := c.service.UpdateRole(&role); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "message": "Failed to update role"})
+		// Check if it's a validation error
+		if validationErrors, ok := err.(validator.ValidationErrors); ok {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error":  "Validation failed",
+				"errors": utils.FormatValidationErrors(validationErrors),
+			})
+			return
+		}
+
+		// Handle database or other errors
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update role", "details": err.Error()})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, role)
+
 }
 
 func (c *RoleController) DeleteRole(ctx *gin.Context) {

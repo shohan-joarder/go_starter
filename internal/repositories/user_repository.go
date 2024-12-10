@@ -1,9 +1,13 @@
 package repositories
 
 import (
+	"github.com/go-playground/validator/v10"
 	"github.com/shohan-joarder/go_pos/internal/models"
+	"github.com/shohan-joarder/go_pos/internal/utils"
 	"gorm.io/gorm"
 )
+
+var validate = validator.New()
 
 type UserRepository struct {
 	DB *gorm.DB
@@ -20,6 +24,18 @@ func (r *UserRepository) GetAllUsers() ([]models.User, error) {
 }
 
 func (r *UserRepository) CreateUser(user *models.User) error {
+
+	validate = validator.New()
+
+	// Register custom validation
+	validate.RegisterValidation("phone", utils.PhoneValidator)
+	validate.RegisterValidation("unique", utils.UniqueValidator(r.DB, false))
+
+	err := validate.Struct(user)
+	if err != nil {
+		return err
+	}
+
 	return r.DB.Create(user).Error
 }
 

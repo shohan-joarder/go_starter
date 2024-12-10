@@ -18,6 +18,7 @@ func (s *UserService) GetUsers() ([]models.User, error) {
 }
 
 func (s *UserService) CreateUser(user *models.User) error {
+
 	return s.repo.CreateUser(user)
 }
 

@@ -30,5 +30,9 @@ func ConnectPostgres(dsn string) *gorm.DB {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
 
+	if err := db.AutoMigrate(&models.Warehouse{}); err != nil {
+		log.Fatalf("Failed to migrate database: %v", err)
+	}
+
 	return db
 }

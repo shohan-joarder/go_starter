@@ -40,15 +40,9 @@ func (c *UserController) GetAllUsers(ctx *gin.Context) {
 func (c *UserController) CreateUser(ctx *gin.Context) {
 	var user models.User
 
-	// Bind JSON input to user model
+	// Bind JSON input to the user model
 	if err := ctx.ShouldBindJSON(&user); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input", "details": err.Error()})
-		return
-	}
-
-	// Validate user input
-	if err := validate.Struct(user); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Validation failed", "details": utils.FormatValidationErrors(err)})
 		return
 	}
 
@@ -60,8 +54,18 @@ func (c *UserController) CreateUser(ctx *gin.Context) {
 	}
 	user.Password = string(hashedPassword)
 
-	// Create user in service layer
+	// Create user via service layer
 	if err := c.service.CreateUser(&user); err != nil {
+		// Check if it's a validation error
+		if validationErrors, ok := err.(validator.ValidationErrors); ok {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"error":  "Validation failed",
+				"errors": utils.FormatValidationErrors(validationErrors),
+			})
+			return
+		}
+
+		// Handle database or other errors
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user", "details": err.Error()})
 		return
 	}

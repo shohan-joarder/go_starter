@@ -4,7 +4,7 @@ import "time"
 
 type Role struct {
 	ID        uint      `gorm:"primaryKey" json:"id"`
-	Name      string    `gorm:"size:100;not null" json:"name" validate:"required,min=2,max=100"`
+	Name      string    `gorm:"size:100;not null" json:"name" validate:"required,min=2,max=100,unique=roles_name"`
 	CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 }

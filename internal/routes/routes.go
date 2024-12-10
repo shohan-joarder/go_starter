@@ -21,16 +21,17 @@ func RegisterUserRoutes(router *gin.RouterGroup, controller *controllers.UserCon
 	authMiddleware := middlewares.NewAuthorizationMiddleware(rolePermission)
 
 	// User routes group
-	userRoutes := router.Group("/users",
-		middlewares.AuthenticateMiddleware(), // Apply authentication middleware
-		authMiddleware.Handle(),              // Apply authorization middleware
-	)
+	userRoutes := router.Group("/users")
+
+	userRoutes.POST("/", controller.CreateUser)
+
+	userRoutes.Use(middlewares.AuthenticateMiddleware())
+	userRoutes.Use(authMiddleware.Handle()) // Apply authorization middleware
 
 	// Define user routes
-	userRoutes.POST("/", controller.CreateUser)
-	userRoutes.GET("/:id", controller.GetUserByID)
-	userRoutes.PUT("/:id", controller.UpdateUser)
 	userRoutes.GET("/", controller.GetAllUsers)
+	userRoutes.GET("/:id", controller.GetUserByID)
+	// userRoutes.PUT("/:id", controller.UpdateUser)
 	userRoutes.DELETE("/:id", controller.DeleteUser)
 }
 
@@ -50,4 +51,23 @@ func RegisterRoleRoutes(apiGroup *gin.RouterGroup, controller *controllers.RoleC
 	roleRoutes.GET("/:id", controller.GetRoleByID)
 	roleRoutes.PUT("/:id", controller.UpdateRole)
 	roleRoutes.DELETE("/:id", controller.DeleteRole)
+}
+
+func RegisterWarehouseRoutes(apiGroup *gin.RouterGroup, controller *controllers.WarehouseController, rolePermission *services.RolePermissionService) {
+	// authMiddleware := middlewares.NewAuthorizationMiddleware(rolePermission)
+	// Initialize middleware
+	wareHouseRoutes := apiGroup.Group("warehouse")
+
+	wareHouseRoutes.Use(middlewares.AuthenticateMiddleware())
+	// wareHouseRoutes.Use(authMiddleware.Handle()) // Apply authorization middleware
+
+	wareHouseRoutes.GET("/", controller.GetAllWarehouses)
+	wareHouseRoutes.GET("/:id", controller.GetWarehouseByID)
+	wareHouseRoutes.POST("/", controller.CreateWarehouse)
+	wareHouseRoutes.PUT("/:id", controller.UpdateWarehouse)
+	wareHouseRoutes.DELETE("/:id", controller.DeleteWarehouse)
+	// authMiddleware := middlewares.NewAuthorizationMiddleware(rolePermission)
+
+	// Product routes group
+	// productRoutes := apiGroup.Group("/products",
 }

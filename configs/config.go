@@ -41,6 +41,11 @@ func Start() {
 	authService := services.NewAuthService(authRepo)
 	authController := controllers.NewAuthController(authService)
 
+	// Initialize repositories and services for auth
+	warehouseRepo := repositories.NewWarehouseRepository(db)
+	warehouseService := services.NewWarehouseService(warehouseRepo)
+	warehouseController := controllers.NewWarehouseController(warehouseService)
+
 	// Setup router
 	router := gin.Default()
 
@@ -48,9 +53,11 @@ func Start() {
 	apiGroup := router.Group("/api", middlewares.JSONValidationMiddleware())
 
 	// Register routes for roles, users, and auth
-	routes.RegisterRoleRoutes(apiGroup, roleController, rolePermissionService) // Role routes
-	routes.RegisterUserRoutes(apiGroup, userController, rolePermissionService) // User routes
-	routes.RegisterAuthRoutes(apiGroup, authController)                        // Auth routes
+	routes.RegisterRoleRoutes(apiGroup, roleController, rolePermissionService)           // Role routes
+	routes.RegisterUserRoutes(apiGroup, userController, rolePermissionService)           // User routes
+	routes.RegisterWarehouseRoutes(apiGroup, warehouseController, rolePermissionService) // Warehouse routes
+
+	routes.RegisterAuthRoutes(apiGroup, authController) // Auth routes
 
 	// Run the server
 	log.Fatal(router.Run(":8080"))

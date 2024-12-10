@@ -60,18 +60,3 @@ func (m *AuthorizationMiddleware) Handle() gin.HandlerFunc {
 		c.Next()
 	}
 }
-
-// Helper function to match dynamic URLs
-// func matchDynamicRoute(requestURL, requestMethod string, rules []AccessRule) bool {
-// 	for _, rule := range rules {
-// 		// Convert dynamic segments (e.g., ":product_id") in the rule's URL to regex patterns
-// 		pattern := "^" + regexp.MustCompile(`:[^/]+`).ReplaceAllString(rule.URL, `[^/]+`) + "$"
-
-// 		// Check if the request matches the rule's URL and HTTP method
-// 		matched, _ := regexp.MatchString(pattern, requestURL)
-// 		if matched && strings.EqualFold(requestMethod, rule.Method) {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }

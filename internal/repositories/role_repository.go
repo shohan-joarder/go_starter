@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"github.com/shohan-joarder/go_pos/internal/models"
+	"github.com/shohan-joarder/go_pos/internal/utils"
 	"gorm.io/gorm"
 )
 
@@ -20,6 +21,13 @@ func (r *RoleRepository) GetAllRoles() ([]models.Role, error) {
 }
 
 func (r *RoleRepository) CreateRole(role *models.Role) error {
+
+	// Register custom validation
+	validate.RegisterValidation("unique", utils.UniqueValidator(r.DB, false))
+	if err := validate.Struct(role); err != nil {
+		return err
+	}
+
 	return r.DB.Create(role).Error
 }
 
@@ -30,6 +38,10 @@ func (r *RoleRepository) GetRoleByID(id uint) (*models.Role, error) {
 }
 
 func (r *RoleRepository) UpdateRole(role *models.Role) error {
+	validate.RegisterValidation("unique", utils.UniqueValidator(r.DB, true))
+	if err := validate.Struct(role); err != nil {
+		return err
+	}
 	return r.DB.Save(role).Error
 }
 

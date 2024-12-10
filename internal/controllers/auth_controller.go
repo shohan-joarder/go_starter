@@ -13,10 +13,6 @@ type AuthController struct {
 	service *services.AuthService
 }
 
-// type AuthController struct {
-// 	service *services.NewAuthService
-// }
-
 func NewAuthController(service *services.AuthService) *AuthController {
 	return &AuthController{service: service}
 }
