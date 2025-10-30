@@ -37,3 +37,7 @@ func (c *AuthController) Login(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"token": token})
 }
+
+func (c *AuthController) Test(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{"message": "Auth test endpoint is working!"})
+}

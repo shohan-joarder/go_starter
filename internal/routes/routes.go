@@ -12,6 +12,11 @@ func RegisterAuthRoutes(apiGroup *gin.RouterGroup, controller *controllers.AuthC
 	authRoutes := apiGroup.Group("/auth")
 	{
 		authRoutes.POST("/login", controller.Login)
+		authRoutes.GET("/test", controller.Test)
+
+		// authRoutes.GET("/test-login",func ()  {
+
+		// })
 	}
 }
 

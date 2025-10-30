@@ -65,6 +65,6 @@ func Start() {
 
 func LoadConfig() *Config {
 	return &Config{
-		DatabaseURL: utils.GetEnv("DATABASE_URL", "host=localhost user=postgres password=root dbname=go_pos port=5432 sslmode=disable"),
+		DatabaseURL: utils.GetEnv("DATABASE_URL", utils.GetEnv("DOCKER_DATABASE_URL", "host=localhost user=postgres password=root dbname=go_pos port=5432 sslmode=disable")),
 	}
 }
